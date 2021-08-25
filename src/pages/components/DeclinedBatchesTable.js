@@ -1,17 +1,20 @@
 import React, { useState } from "react";
 import { CSVLink } from "react-csv";
+import { formatDate } from "../../services/utilities.services";
 import Pagination from "../../common/Pagination";
 import { Paginate } from "../../utils/Paginate";
 import Controller from "../../controllers";
 
 const headers = [
   { label: "Batch No", key: "batch_number" },
-  { label: "Drug Name", key: "medicine_name" },
+  { label: "Drug Name", key: "drug_name" },
+  { label: "Production Date", key: "production_date" },
   { label: "Expiry Date", key: "expiry_date" },
-  { label: "Used Percent", key: "used" },
+  { label: "Reg Date", key: "reg_date" },
+  { label: "Reason", key: "description" },
 ];
 
-const ExpiredBatches = (props) => {
+const DeclinedBatchesTable = (props) => {
   const [paginate, setPaginate] = useState({ pageSize: 8, currentPage: 1 });
 
   const { title, items } = props;
@@ -27,7 +30,7 @@ const ExpiredBatches = (props) => {
   const csvReport = {
     data: items,
     headers: headers,
-    filename: "Expired_Report.csv",
+    filename: "Declined_Report.csv",
   };
 
   return (
@@ -52,18 +55,28 @@ const ExpiredBatches = (props) => {
                     <tr>
                       <th>Batch No</th>
                       <th>Drug Name</th>
-                      <th>Expiry Date</th>
-                      <th>Used quantity (%)</th>
+                      <th>Prod Date</th>
+                      <th>Exp Date</th>
+                      <th>Reg Date</th>
+                      <th>Status</th>
+                      <th>Reason</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recordsData &&
-                      recordsData.map((record) => (
-                        <tr key={record.id}>
-                          <td>{record.batch_number}</td>
-                          <td>{record.medicine_name}</td>
-                          <td>{record.expiry_date}</td>
-                          <td>{record.used}</td>
+                      recordsData.map((item) => (
+                        <tr key={item.id}>
+                          <td>{item.batch_number}</td>
+                          <td>{item.drug_name}</td>
+                          <td>{item.production_date}</td>
+                          <td>{item.expiry_date}</td>
+                          <td>{formatDate(item.reg_date)}</td>
+                          <td>
+                            <em className="text-danger">
+                              {item.is_declined ? "Declined" : "Pending"}
+                            </em>
+                          </td>
+                          <td>{item.description}</td>
                         </tr>
                       ))}
                   </tbody>
@@ -88,4 +101,4 @@ const ExpiredBatches = (props) => {
   );
 };
 
-export default ExpiredBatches;
+export default DeclinedBatchesTable;
